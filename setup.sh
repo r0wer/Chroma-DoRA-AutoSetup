@@ -31,14 +31,36 @@ echo "✓ Python found: $(python3 --version)"
 GITHUB_REPO="https://raw.githubusercontent.com/r0wer/Chroma-LoRA-AutoSetup/main"
 
 # ============================================================================
-# STEP 1: Download config files from GitHub
+# STEP 1: Clone sd-scripts repository
+# ============================================================================
+if [ -d "sd-scripts" ]; then
+    echo ""
+    echo "STEP 1: sd-scripts folder already exists, updating..."
+    cd sd-scripts
+    git checkout sd3 2>/dev/null || git checkout -b sd3
+    git pull
+else
+    echo ""
+    echo "STEP 1: Cloning sd-scripts repository..."
+    git clone https://github.com/kohya-ss/sd-scripts.git
+    cd sd-scripts
+    echo "  Switching to branch sd3..."
+    git checkout sd3
+fi
+
+# ============================================================================
+# STEP 2: Download config files DIRECTLY to destination
 # ============================================================================
 echo ""
-echo "STEP 1: Downloading config files from GitHub..."
-if [ ! -f "lora_config.toml" ]; then
-    wget -q "${GITHUB_REPO}/lora_config.toml" -O lora_config.toml && echo "  ✓ lora_config.toml downloaded"
+echo "STEP 2: Downloading config files directly to destination..."
+
+# Create workspace folder first
+mkdir -p workspace
+
+if [ ! -f "workspace/lora_config.toml" ]; then
+    wget -q "${GITHUB_REPO}/lora_config.toml" -O workspace/lora_config.toml && echo "  ✓ workspace/lora_config.toml downloaded"
 else
-    echo "  ✓ lora_config.toml already exists"
+    echo "  ✓ workspace/lora_config.toml already exists"
 fi
 
 if [ ! -f "train.sh" ]; then
@@ -53,29 +75,11 @@ else
     echo "  ✓ menu.sh already exists"
 fi
 
-# Download model downloader script
+# Download model downloader script (temporary, will remove after use)
 if [ ! -f "download_models.py" ]; then
     wget -q "${GITHUB_REPO}/download_models.py" -O download_models.py && echo "  ✓ download_models.py downloaded"
 else
     echo "  ✓ download_models.py already exists"
-fi
-
-# ============================================================================
-# STEP 2: Clone sd-scripts repository
-# ============================================================================
-if [ -d "sd-scripts" ]; then
-    echo ""
-    echo "STEP 2: sd-scripts folder already exists, updating..."
-    cd sd-scripts
-    git checkout sd3 2>/dev/null || git checkout -b sd3
-    git pull
-else
-    echo ""
-    echo "STEP 2: Cloning sd-scripts repository..."
-    git clone https://github.com/kohya-ss/sd-scripts.git
-    cd sd-scripts
-    echo "  Switching to branch sd3..."
-    git checkout sd3
 fi
 
 # ============================================================================
@@ -160,29 +164,12 @@ echo "  ✓ Folders created"
 # ============================================================================
 echo ""
 echo "STEP 10: Downloading models using Python script..."
-# Run download script (it is in the parent directory)
-python ../download_models.py
+# Run download script
+python download_models.py
 
-# ============================================================================
-# STEP 11: Copying config files
-# ============================================================================
-echo ""
-echo "STEP 11: Copying config files..."
-cp ../lora_config.toml workspace/lora_config.toml 2>/dev/null || echo "  ⚠ lora_config.toml not found in parent directory"
-cp ../train.sh . 2>/dev/null || echo "  ⚠ train.sh not found in parent directory"
-
-# Ensure menu.sh is in sd-scripts directory
-if [ ! -f "menu.sh" ]; then
-    if [ -f "../menu.sh" ]; then
-        cp ../menu.sh .
-    else
-        echo "  Downloading menu.sh..."
-        wget -q "${GITHUB_REPO}/menu.sh" -O menu.sh
-    fi
-fi
-
-chmod +x train.sh menu.sh 2>/dev/null
-echo "  ✓ Files copied and marked as executable"
+# Remove downloader script after use to keep it clean
+rm download_models.py
+echo "  ✓ download_models.py removed"
 
 # ============================================================================
 # SUMMARY
