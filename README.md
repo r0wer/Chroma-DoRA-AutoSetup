@@ -8,7 +8,7 @@ Fully automated installation and LoRA training setup for Chroma1-HD on RTX 4090.
 - **Python**: 3.10 or newer
 - **GPU**: RTX 4090 (or other NVIDIA GPU with CUDA support)
 - **CUDA**: 12.1
-- **Disk Space**: ~60GB free space
+- **Disk Space**: ~30GB free space
 - **Git**: installed
 
 ## ⚡ Quick Start (Installation)

@@ -225,3 +225,9 @@ echo "    OR run training directly:"
 echo "    ./train.sh"
 echo ""
 echo "========================================================================="
+echo ""
+echo "🚀 Launching menu automatically in 3 seconds..."
+sleep 3
+
+# Automatically launch menu
+./menu.sh
